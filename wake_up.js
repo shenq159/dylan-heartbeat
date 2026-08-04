@@ -122,6 +122,18 @@ async function sendPushNotification({ title, body }) {
     }
     return { ok: true, providerLabel: "ntfy" };
   }
+  if (provider === "pushplus") {
+    const token = (process.env.PUSHPLUS_TOKEN || "").trim();
+    if (!token) return { ok: false, providerLabel: "pushplus", reason: "PUSHPLUS_TOKEN 未配置" };
+    const resp = await fetch("http://www.pushplus.plus/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, title: title || "小克🦊", content: body, template: "txt" })
+    });
+    const data = await resp.json();
+    if (data.code === 200) return { ok: true, providerLabel: "pushplus" };
+    return { ok: false, providerLabel: "pushplus", reason: `pushplus返回: ${data.msg}` };
+  }
 
   if (provider !== "bark") {
     return { ok: false, providerLabel: provider || "未知渠道", reason: `不支持的 PUSH_PROVIDER：${provider}` };
