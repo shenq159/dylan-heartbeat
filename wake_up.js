@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { TOOLS_FOR_MODEL,​ callTool } = require(".​/mcp_tools");
+const ｛ TOOLE_FOR_MODEL, callTool ｝ = require("./mcp_tools");
 const fs = require("fs");
 const path = require("path");
 const { buildNtfyPayload } = require("./ntfy_priority");
