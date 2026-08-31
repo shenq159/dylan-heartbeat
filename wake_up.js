@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { TOOLS_FOR_MODEL,​ callTool } = require(".​/mcp_tools");
 const fs = require("fs");
 const path = require("path");
 const { buildNtfyPayload } = require("./ntfy_priority");
@@ -503,7 +504,96 @@ ${historyText}`
     return;
   }
 
-  const response = await fetch(process.env.TARGET_API_URL, {
+  // === MCP工具调用循环 ===
+  const MAX_TOOL_ROUNDS = 3; // 最多3轮工具调用，防止无限循环
+  let currentMessages = [...wakeMessages];
+  let finalAiText = "";
+
+  for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+    const requestBody = {
+      model: process.env.MODEL_NAME,
+      messages: currentMessages,
+      temperature: 0.8,
+      top_p: 0.95,
+      stream: false
+    };
+
+    // 第一轮带tools，后续轮也带（让模型可以继续调用）
+    if (round <= MAX_TOOL_ROUNDS - 1) {
+      requestBody.tools = TOOLS_FOR_MODEL;
+      requestBody.tool_choice = "auto";
+    }
+
+    const response = await fetch(process.env.TARGET_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.TARGET_API_KEY}`
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      throw new Error(`模型返回的不是 JSON（HTTP ${response.status}）：${responseText.slice(0, 300)}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(`模型请求失败（HTTP ${response.status}）：${responseText.slice(0, 300)}`);
+    }
+
+    const choice = data.choices?.[0];
+    const message = choice?.message;
+
+    if (!message) {
+      throw new Error("模型未返回有效message");
+    }
+
+    // 检查是否有tool_calls
+    if (message.tool_calls && message.tool_calls.length > 0) {
+      console.log(`\n[唤醒] 第${round + 1}轮，模型请求调用 ${message.tool_calls.length} 个工具\n`);
+
+      // 把assistant的tool_calls消息加入对话
+      currentMessages.push(message);
+
+      // 逐个调用工具
+      for (const tc of message.tool_calls) {
+        const toolName = tc.function?.name;
+        let toolArgs = {};
+        try {
+          toolArgs = JSON.parse(tc.function?.arguments || "{}");
+        } catch {
+          toolArgs = {};
+        }
+
+        console.log(`[唤醒] 调用工具: ${toolName}`, JSON.stringify(toolArgs).slice(0, 200));
+
+        const result = await callTool(toolName, toolArgs);
+
+        // 把工具结果加入对话
+        currentMessages.push({
+          role: "tool",
+          tool_call_id: tc.id,
+          content: typeof result === "string" ? result : JSON.stringify(result)
+        });
+
+        console.log(`[唤醒] ${toolName} 返回 ${JSON.stringify(result).length} 字符`);
+      }
+
+      // 继续循环，让模型看到工具结果后生成最终回复
+      continue;
+    }
+
+    // 没有tool_calls，这就是最终回复
+    finalAiText = normalizeContentToText(message.content).trim();
+    console.log(`\n[唤醒] 第${round + 1}轮，模型返回最终文本 (${finalAiText.length} 字符)\n`);
+    break;
+  }
+
+  const rawAiText = finalAiText; {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -529,9 +619,8 @@ ${historyText}`
     throw new Error(`模型请求失败（HTTP ${response.status}）：${responseText.slice(0, 300)}`);
   }
 
-  const rawAiText = normalizeContentToText(data.choices?.[0]?.message?.content).trim();
   console.log("\nWake Result Summary:\n");
-  console.log(JSON.stringify({ choices: Array.isArray(data.choices) ? data.choices.length : 0, ai_text_chars: rawAiText.length }));
+  console.log(JSON.stringify({ ai_text_chars: rawAiText.length }));
 
   const diaryResult = extractDiaryFromResponse(rawAiText);
   const diarySaved = appendDiaryEntry(diaryResult.diaryContent);
