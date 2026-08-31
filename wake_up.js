@@ -593,7 +593,7 @@ ${historyText}`
     break;
   }
 
-  const rawAiText = finalAiText; {
+  const rawAiText = finalAiText;
   console.log("\nWake Result Summary:\n");
   console.log(JSON.stringify({ ai_text_chars: rawAiText.length }));
 
