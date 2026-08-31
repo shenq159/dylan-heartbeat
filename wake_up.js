@@ -594,31 +594,6 @@ ${historyText}`
   }
 
   const rawAiText = finalAiText; {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.TARGET_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: process.env.MODEL_NAME,
-      messages: wakeMessages,
-      temperature: 0.8,
-      top_p: 0.95,
-      stream: false
-    })
-  });
-
-  const responseText = await response.text();
-  let data;
-  try {
-    data = JSON.parse(responseText);
-  } catch {
-    throw new Error(`模型返回的不是 JSON（HTTP ${response.status}）：${responseText.slice(0, 300)}`);
-  }
-  if (!response.ok) {
-    throw new Error(`模型请求失败（HTTP ${response.status}）：${responseText.slice(0, 300)}`);
-  }
-
   console.log("\nWake Result Summary:\n");
   console.log(JSON.stringify({ ai_text_chars: rawAiText.length }));
 
