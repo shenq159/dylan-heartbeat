@@ -25,15 +25,15 @@ const MCP_SERVERS = {
     transport: "http",
     headers: {}
   }
-};
+},
    linjian: {
     name: "掌心窗",
-    url: "https://zhangxinchuang-mcp-moqn.onrender.com/mcp",  //
+    url: "https://zhangxinchuang-mcp-moqn.onrender.com/mcp",
     transport: "http",
     headers: {
         Authorization: "Bearer 3"
     }
-}
+};
 
 // ========================
 // 工具名 → MCP服务器映射
@@ -196,7 +196,7 @@ const TOOLS_FOR_MODEL = [
         }
       }
     }
-  }
+  },
 // === 掌心窗 ===
 {
     type: "function",
