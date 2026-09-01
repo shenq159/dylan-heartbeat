@@ -32,7 +32,8 @@ const MCP_SERVERS = {
     transport: "http",
     headers: {
         Authorization: "Bearer 3"
-    }
+     }
+   ｝
 };
 
 // ========================
