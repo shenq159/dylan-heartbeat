@@ -31,7 +31,7 @@ const MCP_SERVERS = {
     url: "https://zhangxinchuang-mcp-moqn.onrender.com/mcp",
     transport: "http",
     headers: {
-        Authorization: "Bearer 3"
+        Authorization: "Bearer 7nxpGyyXlUWJBNhOiLcMTZHdCxUhDsTJWpfEiuDkCyw="
      }
    ｝
 };
