@@ -28,10 +28,10 @@ const MCP_SERVERS = {
 };
    linjian: {
     name: "掌心窗",
-    url: "https://zhangxinchuang-mcp-moqn.onrender.com",  //
+    url: "https://zhangxinchuang-mcp-moqn.onrender.com/mcp",  //
     transport: "http",
     headers: {
-        Authorization: "Bearer 你的LINJIAN_TOKEN"
+        Authorization: "Bearer 3"
     }
 }
 
@@ -56,7 +56,6 @@ const TOOL_TO_SERVER = {
   review_drift_bottles: "garden",
   // 4399小游戏
   // 先不硬编码4399的工具名，后续按需添加
-};
   // 掌心窗
   get_life_state: "linjian",
   get_weather_state: "linjian",
@@ -70,6 +69,8 @@ const TOOL_TO_SERVER = {
   send_notification: "linjian",
   list_diary_books: "linjian",
   get_care_policy: "linjian",
+};
+  
 
 // ========================
 // 开放给模型的工具定义（OpenAI function calling格式）
@@ -196,7 +197,6 @@ const TOOLS_FOR_MODEL = [
       }
     }
   }
-];
 // === 掌心窗 ===
 {
     type: "function",
@@ -291,6 +291,7 @@ const TOOLS_FOR_MODEL = [
         }
     }
 }
+];
 // ========================
 // MCP调用：Streamable HTTP
 // ========================
