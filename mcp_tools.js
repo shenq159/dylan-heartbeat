@@ -24,7 +24,6 @@ const MCP_SERVERS = {
     url: "https://toy.cedarstar.org/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDU0LCJ1c2VybmFtZSI6IuWwj-WFi2ZveCIsImlzX2FpIjp0cnVlLCJpc19hZG1pbiI6ZmFsc2V9.hByOBYBfS4rsSFLocFqcfUWaFSCC8en5Jrwy8TRf2vo",
     transport: "http",
     headers: {}
-  }
 },
    linjian: {
     name: "掌心窗",
