@@ -32,7 +32,7 @@ const MCP_SERVERS = {
     headers: {
         Authorization: "Bearer 7nxpGyyXlUWJBNhOiLcMTZHdCxUhDsTJWpfEiuDkCyw="
      }
-   ｝
+   }
 };
 
 // ========================
